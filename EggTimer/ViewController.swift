@@ -7,18 +7,20 @@
 //
 
 import UIKit
+import AVFoundation
 
 class ViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel!
     
     @IBOutlet weak var progressBar: UIProgressView!
-    let eggTimes = ["Soft": 300, "Medium": 420, "Hard": 720]
-    
+    let eggTimes = ["Soft": 3, "Medium": 4, "Hard": 7]
+
     var totalTime=0;
     var secoundsPassed=0
     
     var timer=Timer()
+    var player: AVAudioPlayer?
     
     @IBAction func HardnessSelected(_ sender: UIButton) {
         timer.invalidate()
@@ -32,14 +34,24 @@ class ViewController: UIViewController {
     }
     
     @objc func updateTimer(){
-        if secoundsPassed < totalTime{
+        if secoundsPassed <= totalTime{
             let percentageProgress=Float(secoundsPassed)/Float(totalTime)
-            secoundsPassed+=1
             progressBar.progress=percentageProgress
+            secoundsPassed+=1
         }
         else{
             timer.invalidate()
             titleLabel.text="DONE"
+            if let url = Bundle.main.url(forResource: "alarm_sound", withExtension: "mp3") {
+                do {
+                    player = try AVAudioPlayer(contentsOf: url)
+                    player?.play()
+                } catch {
+                    print("Error playing sound: \(error.localizedDescription)")
+                }
+            } else {
+                print("Sound file not found. ")
+            }
         }
     }
 }
